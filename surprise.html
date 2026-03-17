@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For My Love ❤️</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: black;
+  overflow-x: hidden;
+  color: white;
+  text-align: center;
+}
+
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.container {
+  position: relative;
+  z-index: 2;
+  top: 10vh;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 3em;
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 10px pink; }
+  to { text-shadow: 0 0 25px red; }
+}
+
+button {
+  padding: 12px 25px;
+  font-size: 1.2em;
+  border: none;
+  border-radius: 30px;
+  background: pink;
+  color: black;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+#hidden {
+  display: none;
+  margin-top: 20px;
+  font-size: 1.5em;
+  animation: fadeIn 2s ease-in;
+}
+
+.gallery {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.gallery img {
+  width: 100%;
+  border-radius: 15px;
+  transition: transform 0.3s;
+}
+
+.gallery img:hover {
+  transform: scale(1.1);
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(20px);} 
+  to {opacity: 1; transform: translateY(0);} 
+}
+
+.heart {
+  position: absolute;
+  color: red;
+  animation: float 6s linear infinite;
+}
+
+@keyframes float {
+  from {transform: translateY(100vh);} 
+  to {transform: translateY(-10vh);} 
+}
+
+/* Proposal popup */
+#proposalBox {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.9);
+  padding: 30px;
+  border-radius: 20px;
+  z-index: 5;
+}
+
+#proposalBox button {
+  margin: 10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="container">
+  <h1>Hey My Love ❤️</h1>
+  <p>I built this just for you...</p>
+  <button onclick="reveal()">Open Your Surprise 💌</button>
+
+  <div id="hidden">
+    <p>You are my favorite person in the world 🌍</p>
+    <p>Every moment with you is special ✨</p>
+    <p>I love you more than words can say ❤️</p>
+
+    <!-- Photo Gallery -->
+    <div class="gallery">
+      <img src="mine .jpeg">
+      <img src="my pic.jpg">
+      <img src="my pics.jpg">
+    </div>
+
+    <button onclick="showProposal()">One More Thing 💖</button>
+  </div>
+</div>
+
+<!-- Proposal Box -->
+<div id="proposalBox">
+  <h2>Will you go on a date with me tomorrow? 💖</h2>
+  <button onclick="yesAnswer()">Yes ❤️</button>
+  <button onclick="moveNo(this)">No 😢</button>
+</div>
+
+<!-- Date Options -->
+<div id="dateOptions" style="display:none; position:relative; z-index:5; margin-top:40px;">
+  <h2>Where should we go? 😍</h2>
+  <button onclick="choosePlace('ghat 🌊')">ghat 🌊</button>
+  <button onclick="choosePlace('eco-Park 🌳')">eco-Park 🌳</button>
+  <button onclick="choosePlace('jhau-bagan 🌸')">jhau-bagan 🌸</button>
+</div>
+
+<audio autoplay loop>
+  <source src="your-song.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+function reveal() {
+  document.getElementById('hidden').style.display = 'block';
+}
+
+function showProposal() {
+  document.getElementById('proposalBox').style.display = 'block';
+}
+
+function yesAnswer() {
+ fetch("https://love-project-production-0029.up.railway.app/response", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      answer: "YES ❤️",
+      time: new Date().toLocaleString()
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('proposalBox').style.display = 'none';
+    document.getElementById('dateOptions').style.display = 'block';
+  })
+  .catch(err => {
+    alert("Error 😢");
+    console.log(err);
+  });
+}
+
+function moveNo(btn) {
+  btn.style.position = 'absolute';
+  btn.style.top = Math.random() * 300 + 'px';
+  btn.style.left = Math.random() * 300 + 'px';
+}
+
+function choosePlace(place) {
+  fetch("http://localhost:3000/response", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      choice: place,
+      time: new Date().toLocaleString()
+    })
+  });
+
+  alert("Yay! Let's go to " + place + " ❤️");
+}
+
+// Floating hearts
+setInterval(() => {
+  const heart = document.createElement('div');
+  heart.className = 'heart';
+  heart.innerText = '❤️';
+  heart.style.left = Math.random() * 100 + 'vw';
+  heart.style.fontSize = Math.random() * 20 + 20 + 'px';
+  document.body.appendChild(heart);
+
+  setTimeout(() => heart.remove(), 6000);
+}, 300);
+
+// Star background
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = [];
+for (let i = 0; i < 100; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: Math.random() * 1.5
+  });
+}
+
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'white';
+  stars.forEach(s => {
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+
+drawStars();
+</script>
+
+</body>
+</html>
